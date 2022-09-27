@@ -2,6 +2,8 @@ import argparse
 from pprint import pprint
 from transcibe import transcribe_file
 
+from database import Database
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='PodcastWhisperer')
@@ -17,6 +19,9 @@ def get_args():
     create.set_defaults(func=create_command)
     create.add_argument('name', help='The name of the podcast')
 
+    shows = subparser.add_parser('shows', help='List all shows')
+    shows.set_defaults(func=shows_command)
+
     return parser
 
 
@@ -26,7 +31,20 @@ def transcribe_command(args):
 
 
 def create_command(args):
-    pass
+    Database().create_show(args.name)
+
+
+def shows_command(_):
+    shows = Database().get_shows()
+
+    if not shows:
+        print('No shows in database. Try adding some.')
+        return
+
+    print('Show ID | Show Name')
+    print('-------------------')
+    for (show_id, name) in shows:
+        print(f'{show_id}\t| {name}')
 
 
 def main():

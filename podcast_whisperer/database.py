@@ -1,4 +1,5 @@
 import sqlite3
+from typing import List, Tuple
 
 
 class Database:
@@ -7,4 +8,13 @@ class Database:
         self.init_db()
 
     def init_db(self):
-        self.con.executescript('init.sql')
+        with open('init.sql', 'r') as script:
+            self.con.executescript(script.read())
+
+    def create_show(self, name=str):
+        self.con.execute('INSERT INTO shows(name) VALUES (:show)', (name,))
+        self.con.commit()
+
+    def get_shows(self) -> List[Tuple[str, str]]:
+        shows = self.con.execute('SELECT * FROM shows')
+        return shows.fetchall()
