@@ -1,5 +1,4 @@
 import argparse
-from pprint import pprint
 from transcibe import transcribe_file
 
 from database import Database
@@ -11,7 +10,7 @@ def get_args():
 
     transcribe = subparser.add_parser('transcribe', help='Transcribe an episode')
     transcribe.set_defaults(func=transcribe_command)
-    transcribe.add_argument('podcast', help='The podcast this episode is from')
+    transcribe.add_argument('show', help='The show this episode is from')
     transcribe.add_argument('name', help='The name of this episode')
     transcribe.add_argument('file', help='The audio file to transcribe')
 
@@ -27,7 +26,9 @@ def get_args():
 
 def transcribe_command(args):
     result = transcribe_file(args.file)
-    pprint(result)
+    transcription = [i['text'] for i in result['segments']]
+    timestamps = [str(i['start']) for i in result['segments']]
+    Database().add_transcription(args.show, args.name, transcription, timestamps)
 
 
 def create_command(args):

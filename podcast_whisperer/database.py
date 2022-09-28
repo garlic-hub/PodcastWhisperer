@@ -18,3 +18,12 @@ class Database:
     def get_shows(self) -> List[Tuple[str, str]]:
         shows = self.con.execute('SELECT * FROM shows')
         return shows.fetchall()
+
+    def add_transcription(self, show: int, name: str, transcription: List[str], timestamps: List[str]):
+        if len(transcription) != len(timestamps):
+            raise Exception('Transcription and timestamp list not equal length')
+
+        cursor = self.con.execute('INSERT INTO episodes(show, name) VALUES (:show, :name)', (show, name))
+        rows = ((cursor.lastrowid, x, y) for x, y in zip(transcription, timestamps))
+        self.con.executemany('INSERT INTO segments(episode, text, timestamps) VALUES (:ep, :text, :stamp)', rows)
+        self.con.commit()
