@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Transcripts Search{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% for segment in segments %}
+<table>
+  <tr>
+    <th>Show</th>
+    <th>Episode</th>
+    <th>Timestamp</th>
+    <th>Text</th>
+  </tr>
+  <tr>
+    <td>{{ segment['show'] }}</td>
+    <td>{{ segment['episode'] }}</td>
+    <td>{{ segment['timestamp'] }}</td>
+    <td>{{ segment['text'] }}</td>
+  </tr>
+</table>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
+{% endblock %}

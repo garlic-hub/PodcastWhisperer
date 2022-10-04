@@ -1,3 +1,11 @@
+-- Where admins accounts are stored
+CREATE TABLE IF NOT EXISTS "users" (
+  "id" INTEGER,
+  "username" TEXT UNIQUE NOT NULL,
+  "password" TEXT NOT NULL,
+  PRIMARY KEY("id")
+);
+
 -- Where the names of a show are stored
 CREATE TABLE IF NOT EXISTS "shows" (
     "id" INTEGER,
