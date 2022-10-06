@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+{% if shows %}
 <form method="post" enctype=multipart/form-data>
   <label for="show">Show</label>
   <select name="show" id="show" required>
@@ -18,4 +19,8 @@
   <input type="file" name="file" required />
   <input type="submit" value="Transcribe Episode">
 </form>
+Please note that this operation can take a while. Please wait for the message at top of screen after you click submit.
+{% else %}
+No shows in database. Please add some from home page of PodcastWhisperer.
+{% endif %}
 {% endblock %}

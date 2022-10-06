@@ -1,14 +1,10 @@
 from tempfile import NamedTemporaryFile
 
-from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
-)
-from werkzeug.exceptions import abort
-from werkzeug.utils import secure_filename
+from flask import Blueprint, flash, redirect, render_template, request
 
 from .auth import login_required
 from .database import get_db
-from .transcibe import transcribe_file
+from .transcribe import transcribe_file
 
 bp = Blueprint('site', __name__)
 
@@ -30,6 +26,32 @@ def search():
     segments = get_db().search_transcripts(text)
 
     return render_template('site/search.html', segments=segments)
+
+
+@bp.route('/episode_list/<show_name>')
+def episode_list(show_name):
+    show = get_db().get_show_by_name(show_name)
+
+    if not show:
+        flash('Show does not exist. Please check spelling or select one below.')
+        return redirect('/')
+
+    episodes = get_db().get_episodes(show.id)
+
+    return render_template('site/episode_list.html', show=show.name, episodes=episodes)
+
+
+@bp.route('/transcripts/<episode_id>')
+def view_transcript(episode_id):
+    segments = get_db().get_transcript(episode_id)
+
+    if not segments:
+        flash('Episode does not exist')
+        return redirect('/')
+
+    transcript = ' '.join((s.text for s in segments))
+
+    return render_template('site/transcript.html', transcript=transcript)
 
 
 @bp.route('/transcribe', methods=('GET', 'POST'))
@@ -58,13 +80,13 @@ def transcribe():
         if file.filename == '':
             flash('Please select a file to upload')
             return redirect(request.url)
-        
+
         with NamedTemporaryFile() as tmp:
             file.save(tmp)
             filename = tmp.name
             result = transcribe_file(filename)
             transcription = (i['text'] for i in result['segments'])
-            timestamps = (str(i['start']) for i in result['segments'])
+            timestamps = (int(i['start']) for i in result['segments'])
             get_db().add_transcription(show.id, episode_name, transcription, timestamps)
 
         flash('Transcription added')

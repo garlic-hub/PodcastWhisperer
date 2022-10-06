@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% for segment in segments %}
+{% if segments %}
 <table>
   <tr>
     <th>Show</th>
@@ -13,15 +13,16 @@
     <th>Timestamp</th>
     <th>Text</th>
   </tr>
+  {% for segment in segments %}
   <tr>
     <td>{{ segment['show'] }}</td>
     <td>{{ segment['episode'] }}</td>
     <td>{{ segment['timestamp'] }}</td>
     <td>{{ segment['text'] }}</td>
   </tr>
+  {% endfor %}
 </table>
-{% if not loop.last %}
-<hr>
+{% else %}
+No hits for search query
 {% endif %}
-{% endfor %}
 {% endblock %}

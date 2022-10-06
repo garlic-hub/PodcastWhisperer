@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "segments" (
     "id" INTEGER,
     "episode" INTEGER,
     "text" TEXT NOT NULL,
-    "timestamps" TEXT NOT NULL,
+    "timestamp" INTEGER NOT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("episode") REFERENCES "episodes" ("id")
 );

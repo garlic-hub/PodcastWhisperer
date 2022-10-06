@@ -4,7 +4,7 @@ import click
 from flask import current_app, g
 from typing import List, Tuple, Iterable, Optional
 
-from .structures import User, Show, Segment
+from .structures import User, Show, Segment, SearchSegment, Episode
 
 
 def get_db():
@@ -75,23 +75,31 @@ class Database:
         cursor = self.con.execute('SELECT * FROM shows')
         return [Show(s) for s in cursor.fetchall()]
 
-    def get_show_by_name(self, name:str):
+    def get_show_by_name(self, name: str):
         result = self.con.execute('SELECT * FROM shows WHERE name = :name', (name,)).fetchone()
         if result:
             return Show(result)
         else:
             return None
 
+    def get_episodes(self, show: int) -> List[Episode]:
+        cursor = self.con.execute('SELECT * FROM episodes WHERE show = :show ', (show,))
+        return [Episode(e) for e in cursor.fetchall()]
+
     def add_transcription(self, show: int, name: str, transcription: Iterable[str], timestamps: Iterable[str]):
         cursor = self.con.execute('INSERT INTO episodes(show, name) VALUES (:show, :name)', (show, name))
         rows = ((cursor.lastrowid, x, y) for x, y in zip(transcription, timestamps, strict=True))
-        self.con.executemany('INSERT INTO segments(episode, text, timestamps) VALUES (:ep, :text, :stamp)', rows)
+        self.con.executemany('INSERT INTO segments(episode, text, timestamp) VALUES (:ep, :text, :stamp)', rows)
         self.con.commit()
 
-    def search_transcripts(self, text:str) -> List[Segment]:
-        cursor = self.con.execute('''SELECT rowid, text, timestamps, episodes.name AS episode_name, shows.name AS show_name FROM segments
-            JOIN (SELECT rowid FROM text_index(:text) LIMIT 25) ON segments.id = rowid 
+    def get_transcript(self, episode_id: int) -> List[Segment]:
+        cursor = self.con.execute('SELECT * FROM segments WHERE episode = :epsiode_id', (episode_id,))
+        return [Segment(s) for s in cursor.fetchall()]
+
+    def search_transcripts(self, text: str) -> List[SearchSegment]:
+        cursor = self.con.execute('''SELECT rowid, text, timestamp, episodes.name AS episode_name, shows.name AS show_name FROM segments
+            JOIN (SELECT rowid FROM text_index(:text) ORDER BY rank LIMIT 25) ON segments.id = rowid 
             JOIN episodes ON segments.episode = episodes.id
             JOIN shows ON episodes.show = shows.id;''', (text,))
 
-        return [Segment(s) for s in cursor.fetchall()]
+        return [SearchSegment(s) for s in cursor.fetchall()]

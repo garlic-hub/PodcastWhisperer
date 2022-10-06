@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Select a Transcription To View{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h2>Episodes for {{ show }}</h2>
+<ul>
+  {% for episode in episodes %}
+  <li><a class="action" href="{{ url_for('site.view_transcript', episode_id=episode['id']) }}">{{ episode['name'] }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
