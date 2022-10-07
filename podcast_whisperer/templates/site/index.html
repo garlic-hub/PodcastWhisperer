@@ -1,31 +1,24 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Home{% endblock %}</h1>
-  {% if g.user %}
-    <a class="action" href="{{ url_for('site.new_show') }}">New Show</a>
-    <a class="action" href="{{ url_for('site.transcribe') }}">Transcribe Episode</a>
-  {% endif %}
+{% block title %}Search and View Transcripts{% endblock %}
 {% endblock %}
 
 {% block content %}
-  <h2>Search Episode Transcripts</h2>
-  <form action="/search" method="get">
-    <label for="text">Text</label>
-    <input name="text" id="text" required>
-    <input type="submit" value="Search">
-  </form>
-  <h2>View Whole Transcripts</h2>
+<div class="list-group w-auto">
+  {% if not shows %}
+  Please log in and add a show from the menu
+  {% else %}
   {% for show in shows %}
-    <article class="post">
-      <header>
-        <div>
-          <a class="action" href="{{ url_for('site.episode_list', show_name=show['name']) }}">{{ show['name'] }}</a>
-        </div>
-      </header>
-    </article>
-    {% if not loop.last %}
-      <hr>
-    {% endif %}
+  <a href="{{ url_for('site.episode_list', show_name=show['name']) }}" class="list-group-item list-group-item-action d-flex gap-3 py-3">
+    <img src="https://github.com/twbs.png" alt="Podcast Icon" width="32" height="32" class="rounded-circle flex-shrink-0">
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      {{ show['name'] }}
+      <small class="opacity-50 text-nowrap">now</small>
+    </div>
+  </a>
   {% endfor %}
+  {% endif %}
+</div>
+
 {% endblock %}

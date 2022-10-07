@@ -56,11 +56,11 @@ class Segment:
 
     def __init__(self, row: Dict):
         """Init a Segment from the results of a database query"""
-        print(row)
         self.id = row['id']
         self.episode = row['episode']
         self.text = row['text']
         self.timestamp = seconds_to_timestamp(row['timestamp'])
+
 
 @dataclass
 class SearchSegment:
@@ -73,7 +73,6 @@ class SearchSegment:
 
     def __init__(self, row: Dict):
         """Init a Segment from the results of a database query"""
-        print(row)
         self.id = row['rowid']
         self.show = row['show_name']
         self.episode = row['episode_name']

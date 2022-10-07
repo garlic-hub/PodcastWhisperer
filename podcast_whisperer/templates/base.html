@@ -1,23 +1,56 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - PodcastWhisperer</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<nav>
-  <h1><a href="{{ url_for('site.index') }}">PodcastWhisperer</a></h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-    {% else %}
-      <li><a href="{{ url_for('auth.login') }}">Log In</a>
-    {% endif %}
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
+<head>
+  <title>{% block title %}{% endblock %} - PodcastWhisperer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+  <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+  <div class="container">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('site.index') }}">Podcast Whisperer</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarHeader">
+          <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{{ url_for('site.index') }}">Home</a>
+            </li>
+            {% if g.user %}
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('site.new_show') }}">New Show</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('site.transcribe') }}">Transcribe Episode</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('auth.logout') }}">Log Out</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('auth.login') }}">Log In</a>
+            </li>
+            {% endif %}
+            </ul>
+            <form action="/search" method="get" role="search">
+              <input class="form-control" type="search" name="text" placeholder="Search all transcripts">
+            </form>
+        </div>
+      </div>
+    </nav>
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-primary" role="alert">
+      {{ message }}
+    </div>
+    {% endfor %}
+    <header>
+      <h2>{% block header %}{% endblock %}</h2>
+    </header>
+    {% block content %}{% endblock %}
+  </div>
+</body>

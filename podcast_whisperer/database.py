@@ -2,7 +2,7 @@ import sqlite3
 
 import click
 from flask import current_app, g
-from typing import List, Tuple, Iterable, Optional
+from typing import List, Iterable, Optional
 
 from .structures import User, Show, Segment, SearchSegment, Episode
 
@@ -25,7 +25,7 @@ def init_db_command():
     click.echo('Initialized the database. Note this does not wipe an already created database.')
 
 
-def close_db(e=None):
+def close_db(_=None):
     db = g.pop('db', None)
 
     if db is not None:
@@ -53,8 +53,8 @@ class Database:
         self.con.execute('INSERT INTO users(username, password) VALUES (:user, :pass)', (username, hashed_password))
         self.con.commit()
 
-    def get_user_by_id(self, id: int) -> Optional[User]:
-        result = self.con.execute('SELECT * FROM users WHERE id = :id', (id,)).fetchone()
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        result = self.con.execute('SELECT * FROM users WHERE id = :id', (user_id,)).fetchone()
         if result:
             return User(result)
         else:
