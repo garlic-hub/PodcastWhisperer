@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
+from datetime import datetime
 
 
 @dataclass
@@ -20,11 +21,20 @@ class User:
 class Show:
     id: int
     name: str
+    image: str
+    last_updated: Optional[int]
 
     def __init__(self, row: Dict):
         """Init a Show from the results of a database query"""
         self.id = row['id']
         self.name = row['name']
+        self.image = row['image']
+
+        # If timestamp is not null, format it into string date
+        if row['last_updated']:
+            self.last_updated = datetime.fromtimestamp(row['last_updated']).strftime('%b %-d, %Y')
+        else:
+            self.last_updated = None
 
 
 @dataclass

@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 import click
 from flask import current_app, g
@@ -67,8 +68,8 @@ class Database:
         else:
             return None
 
-    def create_show(self, name=str):
-        self.con.execute('INSERT INTO shows(name) VALUES (:user)', (name,))
+    def create_show(self, name: str, path_to_image: str):
+        self.con.execute('INSERT INTO shows(name, image, last_updated) VALUES (:user, :image, NULL)', (name, path_to_image))
         self.con.commit()
 
     def get_shows(self) -> List[Show]:
@@ -87,9 +88,13 @@ class Database:
         return [Episode(e) for e in cursor.fetchall()]
 
     def add_transcription(self, show: int, name: str, transcription: Iterable[str], timestamps: Iterable[str]):
+        # Add segments to database
         cursor = self.con.execute('INSERT INTO episodes(show, name) VALUES (:show, :name)', (show, name))
         rows = ((cursor.lastrowid, x, y) for x, y in zip(transcription, timestamps, strict=True))
         self.con.executemany('INSERT INTO segments(episode, text, timestamp) VALUES (:ep, :text, :stamp)', rows)
+
+        # Update timestamp
+        self.con.execute('UPDATE shows SET last_updated = :timestamp WHERE id = :show', (time.time(), show))
         self.con.commit()
 
     def get_transcript(self, episode_id: int) -> List[Segment]:

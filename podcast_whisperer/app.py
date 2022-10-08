@@ -11,11 +11,18 @@ def create_app():
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'whisperer.db'),
+        UPLOAD=os.path.join(app.instance_path, 'upload')
     )
 
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
+    # ensure the images folder exists
+    try:
+        os.makedirs(app.config['UPLOAD'])
     except OSError:
         pass
 

@@ -11,10 +11,12 @@
   {% else %}
   {% for show in shows %}
   <a href="{{ url_for('site.episode_list', show_name=show['name']) }}" class="list-group-item list-group-item-action d-flex gap-3 py-3">
-    <img src="https://github.com/twbs.png" alt="Podcast Icon" width="32" height="32" class="rounded-circle flex-shrink-0">
+    <img src="{{ url_for('site.download_file', name=show['image']) }}" alt="Podcast Icon" width="50" height="50" class="rounded flex-shrink-0">
     <div class="d-flex gap-2 w-100 justify-content-between">
       {{ show['name'] }}
-      <small class="opacity-50 text-nowrap">now</small>
+      {% if show['last_updated'] %}
+      <small class="opacity-50 text-nowrap">Updated: {{ show['last_updated'] }}</small>
+      {% endif %}
     </div>
   </a>
   {% endfor %}

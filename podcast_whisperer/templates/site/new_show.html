@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
 
 {% block header %}
-{% block title %}Add a New Show{% endblock %}>
+{% block title %}Add a New Show{% endblock %}
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="show">Show</label>
-    <input name="show" id="show" required>
-    <input type="submit" value="Add Show">
-  </form>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label for="show_name" class="form-label">Show Name</label>
+    <input class="form-control" id="show_name" name="show" required>
+  </div>
+  <div class="mb-3">
+    <label for="image" class="form-label">Podcast Icon</label>
+    <input class="form-control" type="file" id="image" name="image" required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary mb-3">Add Show</button>
+  </div>
+</form>
 {% endblock %}

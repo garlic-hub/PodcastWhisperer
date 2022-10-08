@@ -7,9 +7,12 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 
 -- Where the names of a show are stored
+-- image is a relative path to the image
 CREATE TABLE IF NOT EXISTS "shows" (
     "id" INTEGER,
     "name" TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    "image" TEXT NOT NULL,
+    "last_updated" INTEGER,
     PRIMARY KEY("id")
 );
 
@@ -36,7 +39,6 @@ CREATE VIRTUAL TABLE IF NOT EXISTS "text_index" USING fts5 (
     text,
     content=segments,
     content_rowid=id,
-    tokenize="trigram"
 );
 
 -- Triggers to keep the FTS index up to date

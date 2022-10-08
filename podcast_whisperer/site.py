@@ -1,17 +1,27 @@
+import os
 from tempfile import NamedTemporaryFile
 
-from flask import Blueprint, flash, redirect, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, current_app, send_from_directory
+from werkzeug.utils import secure_filename
 
 from .auth import login_required
 from .database import get_db
 from .transcribe import transcribe_file
 
+# Image formats that HTML <img> tag supports
+ALLOWED_IMAGE_EXTENSIONS = ('png', 'jpg', 'jpeg', 'svg')
+
 bp = Blueprint('site', __name__)
+
+
+def allowed_image_file(filename: str) -> bool:
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
 
 
 @bp.route('/')
 def index():
     shows = get_db().get_shows()
+    print(shows)
     return render_template('site/index.html', shows=shows)
 
 
@@ -99,12 +109,43 @@ def transcribe():
 @login_required
 def new_show():
     if request.method == 'POST':
-        db = get_db()
-        show = request.form['show']
-        if db.get_show_by_name(show):
+        show_name = request.form['show']
+
+        # Ensure show name exists and isn't empty
+        if not show_name:
+            flash('Show name cannot be empty')
+            return redirect(request.url)
+
+        # Ensure show with that name does not already exist
+        if get_db().get_show_by_name(show_name):
             flash('A show with that name already exists')
-        else:
-            db.create_show(show)
+
+        # Check that POST has file part
+        if 'image' not in request.files:
+            flash('Podcast image was not present in request')
+            return redirect(request.url)
+
+        image = request.files['image']
+
+        # If the user does not select a file, the browser submits an empty file without a filename.
+        if image.filename == '':
+            flash('Please select a file to upload')
+            return redirect(request.url)
+
+        # Ensure that file type is good image format and secure the filename
+        if allowed_image_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(current_app.config['UPLOAD'], filename))
+
+            # Everything checks out, add show to database
+            get_db().create_show(show_name, filename)
             flash('Show created')
+        else:
+            flash(f'Bad file type. Please use one of the following: {", ".join(ALLOWED_IMAGE_EXTENSIONS)}')
 
     return render_template('site/new_show.html')
+
+
+@bp.route('/uploads/<name>')
+def download_file(name):
+    return send_from_directory(current_app.config["UPLOAD"], name)
