@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block header %}
-{% block title %}Select a Transcription To View{% endblock %}
+{% block title %}Transcripts for {{ show }}{% endblock %}
 {% endblock %}
 
 {% block content %}
-<h2>Episodes for {{ show }}</h2>
-<ul>
+What episode would you like to view a transcript for?
+<div class="list-group">
   {% for episode in episodes %}
-  <li><a class="action" href="{{ url_for('site.view_transcript', episode_id=episode['id']) }}">{{ episode['name'] }}</a></li>
+  <a class="list-group-item list-group-item-action" href="{{ url_for('site.view_transcript', episode_id=episode['id']) }}">{{ episode['name'] }}</a>
   {% endfor %}
-</ul>
+</div>
 {% endblock %}

@@ -73,7 +73,7 @@ class Database:
         self.con.commit()
 
     def get_shows(self) -> List[Show]:
-        cursor = self.con.execute('SELECT * FROM shows')
+        cursor = self.con.execute('SELECT * FROM shows ORDER BY name')
         return [Show(s) for s in cursor.fetchall()]
 
     def get_show_by_name(self, name: str):
