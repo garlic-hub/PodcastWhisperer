@@ -42,7 +42,7 @@ def login():
 
         # Account doesn't exist
         if not user:
-            flash('Bad login.')
+            flash('Bad login')
         elif check_password_hash(user.hashed_password, request_password):
             session.clear()
             session['user_id'] = user.id
