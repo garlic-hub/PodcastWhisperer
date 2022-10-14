@@ -1,0 +1,4 @@
+include podcast_whisperer/init.sql
+graft podcast_whisperer/static
+graft podcast_whisperer/templates
+global-exclude *.pyc
