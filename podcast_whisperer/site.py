@@ -21,7 +21,6 @@ def allowed_image_file(filename: str) -> bool:
 @bp.route('/')
 def index():
     shows = get_db().get_shows()
-    print(shows)
     return render_template('site/index.html', shows=shows)
 
 
@@ -59,9 +58,7 @@ def view_transcript(episode_id):
         flash('Episode does not exist')
         return redirect('/')
 
-    transcript = ' '.join((s.text for s in segments))
-
-    return render_template('site/transcript.html', transcript=transcript)
+    return render_template('site/transcript.html', segments=segments)
 
 
 @bp.route('/transcribe', methods=('GET', 'POST'))

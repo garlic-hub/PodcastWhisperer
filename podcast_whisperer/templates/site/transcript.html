@@ -5,5 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{{ transcript }}
+{% for segment in segments %}
+    <br>[{{ segment['timestamp'] }}]{{ segment['text'] }}</br>
+{% endfor %}
 {% endblock %}

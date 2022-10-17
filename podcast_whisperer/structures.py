@@ -22,7 +22,7 @@ class Show:
     id: int
     name: str
     image: str
-    last_updated: Optional[int]
+    last_updated: Optional[str]
 
     def __init__(self, row: Dict):
         """Init a Show from the results of a database query"""
