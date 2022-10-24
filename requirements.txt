@@ -1,2 +1,2 @@
-flask==2.2.0
+flask==2.2
 whisper @ git+https://github.com/openai/whisper.git
