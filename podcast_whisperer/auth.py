@@ -1,4 +1,6 @@
 import functools
+import sys
+
 import click
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -15,11 +17,14 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @click.argument('password')
 def create_admin(username, password):
     if not username:
-        print("Username cannot be empty")
+        click.echo('Username cannot be empty', err=True)
+        sys.exit(1)
     elif not password:
-        print("Password cannot be empty")
+        click.echo('Password cannot be empty', err=True)
+        sys.exit(1)
     else:
         get_db().create_user(username, generate_password_hash(password))
+        click.echo('New admin created')
 
 
 @bp.before_app_request
