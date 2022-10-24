@@ -1,4 +1,4 @@
-from podcast_whisperer.app import create_app
+from podcast_whisperer import create_app
 
 
 def test_config():

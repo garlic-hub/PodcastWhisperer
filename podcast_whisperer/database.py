@@ -5,7 +5,7 @@ import click
 from flask import current_app, g
 from typing import List, Iterable, Optional
 
-from .structures import User, Show, Segment, SearchSegment, Episode
+from podcast_whisperer.structures import User, Show, Segment, SearchSegment, Episode
 
 
 def get_db():

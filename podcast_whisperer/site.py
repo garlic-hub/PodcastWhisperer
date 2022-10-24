@@ -4,9 +4,9 @@ from tempfile import NamedTemporaryFile
 from flask import Blueprint, flash, redirect, render_template, request, current_app, send_from_directory
 from werkzeug.utils import secure_filename
 
-from .auth import login_required
-from .database import get_db
-from .transcribe import transcribe_file
+from podcast_whisperer.auth import login_required
+from podcast_whisperer.database import get_db
+from podcast_whisperer.transcribe import transcribe_file
 
 # Image formats that HTML <img> tag supports
 ALLOWED_IMAGE_EXTENSIONS = ('png', 'jpg', 'jpeg', 'svg')

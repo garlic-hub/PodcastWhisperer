@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from podcast_whisperer.app import create_app
+from podcast_whisperer import create_app
 from podcast_whisperer.database import get_db, init_db
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:

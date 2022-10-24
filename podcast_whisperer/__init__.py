@@ -1,9 +1,11 @@
 import os.path
 from flask import Flask
 
-from . import database
-from . import auth
-from . import site
+import podcast_whisperer.auth
+import podcast_whisperer.database
+import podcast_whisperer.site
+import podcast_whisperer.structures
+import podcast_whisperer.transcribe
 
 
 def create_app(test_config=None):
