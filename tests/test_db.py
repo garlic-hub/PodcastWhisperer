@@ -13,9 +13,9 @@ def test_get_close_db(app):
     # Database connection is closed once above with statement is complete
     # Test that db errors out properly
     with pytest.raises(sqlite3.ProgrammingError) as e:
-        db.con.execute('SELECT 1')
+        db.con.execute("SELECT 1")
 
-    assert 'closed' in str(e.value)
+    assert "closed" in str(e.value)
 
 
 def test_init_db_command(runner, monkeypatch):
@@ -25,7 +25,10 @@ def test_init_db_command(runner, monkeypatch):
     def fake_init_db():
         Recorder.called = True
 
-    monkeypatch.setattr('podcast_whisperer.database.init_db', fake_init_db)
-    result = runner.invoke(args=['init-db'])
-    assert 'Initialized the database. Note this does not wipe an already created database.\n' == result.output
+    monkeypatch.setattr("podcast_whisperer.database.init_db", fake_init_db)
+    result = runner.invoke(args=["init-db"])
+    assert (
+        "Initialized the database. Note this does not wipe an already created database.\n"
+        == result.output
+    )
     assert Recorder.called
