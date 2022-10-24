@@ -40,3 +40,13 @@ def test_login_required(client, path):
     """Check that admin pages can't be accessed without a login"""
     response = client.post(path)
     assert response.headers["Location"] == "/auth/login"
+
+
+def test_new_show_get(client, auth):
+    """Check that new show page has required form fields"""
+    auth.login()
+    response = client.get('/new-show')
+
+    assert b'Show Name' in response.data
+    assert b'Podcast Icon' in response.data
+    assert b'Add Show' in response.data
