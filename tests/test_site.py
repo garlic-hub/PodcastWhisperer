@@ -1,5 +1,6 @@
+import io
+
 import pytest
-from podcast_whisperer.database import get_db
 
 
 def check_navbar(response):
@@ -55,3 +56,99 @@ def test_new_show_get(client, auth):
     assert b"Show Name" in response.data
     assert b"Podcast Icon" in response.data
     assert b"Add Show" in response.data
+
+
+@pytest.mark.parametrize(
+    ("show", "icon", "message"),
+    (
+        ("foo", (io.BytesIO(b"abc"), "image.png"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.PNG"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.jpg"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.JPG"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.jpeg"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.JPEG"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.svg"), b"Show created"),
+        ("foo", (io.BytesIO(b"abc"), "image.SVG"), b"Show created"),
+        (
+            "foo",
+            (io.BytesIO(b"abc"), "image.h"),
+            b"Bad file type. Please use one of the following: png, jpg, jpeg, svg",
+        ),
+        (
+            "foo",
+            (io.BytesIO(b"abc"), "image.pdf"),
+            b"Bad file type. Please use one of the following: png, jpg, jpeg, svg",
+        ),
+        (
+            "foo",
+            (io.BytesIO(b"abc"), "image.py"),
+            b"Bad file type. Please use one of the following: png, jpg, jpeg, svg",
+        ),
+        (
+            "foo",
+            (io.BytesIO(b"abc"), "image.txt"),
+            b"Bad file type. Please use one of the following: png, jpg, jpeg, svg",
+        ),
+        (
+            "foo",
+            (io.BytesIO(b"abc"), "image.ico"),
+            b"Bad file type. Please use one of the following: png, jpg, jpeg, svg",
+        ),
+        ("", (io.BytesIO(b"abc"), "image.jpg"), b"Show name cannot be empty"),
+        (
+            "Shakespeare",
+            (io.BytesIO(b"abc"), "image.jpg"),
+            b"A show with that name already exists",
+        ),
+        (
+            "Shakespeare",
+            (io.BytesIO(b"abc"), "image.jpg"),
+            b"A show with that name already exists",
+        ),
+        ("bar", None, b"Podcast image was not present in request"),
+        ("bar", (io.BytesIO(b"abc"), ""), b"Please select a file to upload"),
+    ),
+)
+def test_new_show_post(client, auth, show, icon, message):
+    auth.login()
+    response = client.post("/new-show", data={"show": show, "image": icon})
+
+    assert message in response.data
+    check_navbar_logged_in(response)
+
+
+@pytest.mark.parametrize(
+    ("search", "messages"),
+    (
+        ("", (b"Search text must be at least 3 characters long",)),
+        ("a", (b"Search text must be at least 3 characters long",)),
+        ("ab", (b"Search text must be at least 3 characters long",)),
+        ("abc", (b"No hits for search query",)),
+        ("foo bar", (b"No hits for search query",)),
+        ("can't", (b"No hits for search query",)),
+        ('can"t', (b"No hits for search query",)),
+        # Make sure we don't break on special characters
+        ("~!@#$%^&*()_+\\|?/,<.>;:'", (b"No hits for search query",)),
+        ("the", (b"Show", b"Episode", b"Timestamp", b"Text")),
+        (
+            "Stand",
+            (b"Shakespeare", b"Hamlet", b"Stand", b"stand", b"00:00:06", b"00:00:01"),
+        ),
+        (
+            "stand",
+            (b"Shakespeare", b"Hamlet", b"Stand", b"stand", b"00:00:06", b"00:00:01"),
+        ),
+        (
+            "Who's",
+            # The ascii character for apostrophe
+            (b"Shakespeare", b"Hamlet", b"Who&#39;s there?", b"00:00:00"),
+        ),
+    ),
+)
+def test_search(client, search, messages):
+    response = client.get(
+        "/search", query_string={"text": search}, follow_redirects=True
+    )
+    for m in messages:
+        assert m in response.data
+        check_navbar(response)

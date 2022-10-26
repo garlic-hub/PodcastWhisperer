@@ -15,4 +15,5 @@ INSERT INTO segments(id, episode, text, timestamp) VALUES
     (3, 1, 'Long live the King!', 2),
     (4, 1, 'Bernardo?', 3),
     (5, 1, 'He.', 4),
-    (6, 1, 'You come most carefully upon your hour', 5);
+    (6, 1, 'You come most carefully upon your hour', 5),
+    (7, 1, 'Test code to match above: stand', 6);

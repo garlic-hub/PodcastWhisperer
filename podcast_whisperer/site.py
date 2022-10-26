@@ -122,23 +122,24 @@ def new_show():
         # Ensure show name exists and isn't empty
         if not show_name:
             flash("Show name cannot be empty")
-            return redirect(request.url)
+            return render_template("site/new_show.html")
 
         # Ensure show with that name does not already exist
         if get_db().get_show_by_name(show_name):
             flash("A show with that name already exists")
+            return render_template("site/new_show.html")
 
         # Check that POST has file part
         if "image" not in request.files:
             flash("Podcast image was not present in request")
-            return redirect(request.url)
+            return render_template("site/new_show.html")
 
         image = request.files["image"]
 
         # If the user does not select a file, the browser submits an empty file without a filename.
         if image.filename == "":
             flash("Please select a file to upload")
-            return redirect(request.url)
+            return render_template("site/new_show.html")
 
         # Ensure that file type is good image format and secure the filename
         if allowed_image_file(image.filename):

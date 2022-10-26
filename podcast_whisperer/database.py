@@ -1,3 +1,4 @@
+import re
 import sqlite3
 import time
 
@@ -135,6 +136,12 @@ class Database:
         return [Segment(s) for s in cursor.fetchall()]
 
     def search_transcripts(self, text: str) -> List[SearchSegment]:
+        # Replace whitespace with pluses to concatenate
+        text = re.sub(r"\s", "+", text)
+        # Sanitize quotes because sqlite FTS syntax
+        text = text.replace('"', '""')
+        # Wrap text in quotes to help prevent unintended sqlite FTS operator usage
+        text = f'"{text}"'
         cursor = self.con.execute(
             """SELECT rowid, text, timestamp, episodes.name AS episode_name, shows.name AS show_name FROM segments
             JOIN (SELECT rowid FROM text_index(:text) ORDER BY rank LIMIT 25) ON segments.id = rowid
