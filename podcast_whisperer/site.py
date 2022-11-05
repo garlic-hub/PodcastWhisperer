@@ -66,7 +66,7 @@ def view_transcript(episode_id):
     segments = get_db().get_transcript(episode_id)
 
     if not segments:
-        flash("Episode does not exist")
+        flash("Episode does not exist.")
         return redirect("/")
 
     return render_template("site/transcript.html", segments=segments)

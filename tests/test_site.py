@@ -152,3 +152,30 @@ def test_search(client, search, messages):
     for m in messages:
         assert m in response.data
         check_navbar(response)
+
+
+@pytest.mark.parametrize(
+    ("search", "message"),
+    (
+        ("Shakespeare", b"Hamlet"),
+        ("test", b"Show does not exist. Please check spelling or select one below."),
+    ),
+)
+def test_episode_list(client, search, message):
+    response = client.get(f"/episode_list/{search}", follow_redirects=True)
+
+    assert message in response.data
+
+
+@pytest.mark.parametrize(
+    ("search", "message"),
+    (
+        ("1", b"[00:00:03] Bernardo?"),
+        ("2", b"Episode does not exist."),
+        ("test", b"Episode does not exist."),
+    ),
+)
+def test_transcript_view(client, search, message):
+    response = client.get(f"/transcripts/{search}", follow_redirects=True)
+
+    assert message in response.data
