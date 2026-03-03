@@ -55,14 +55,14 @@ class Database:
 
     def create_user(self, username=str, hashed_password=str):
         self.con.execute(
-            "INSERT INTO users(username, password) VALUES (:user, :pass)",
+            "INSERT INTO users(username, password) VALUES (?, ?)",
             (username, hashed_password),
         )
         self.con.commit()
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         result = self.con.execute(
-            "SELECT * FROM users WHERE id = :id", (user_id,)
+            "SELECT * FROM users WHERE id = ?", (user_id,)
         ).fetchone()
         if result:
             return User(result)
@@ -71,7 +71,7 @@ class Database:
 
     def get_user_by_name(self, username: str) -> Optional[User]:
         result = self.con.execute(
-            "SELECT * FROM users WHERE username = :user", (username,)
+            "SELECT * FROM users WHERE username = ?", (username,)
         ).fetchone()
         if result:
             return User(result)
@@ -80,7 +80,7 @@ class Database:
 
     def create_show(self, name: str, path_to_image: str):
         self.con.execute(
-            "INSERT INTO shows(name, image, last_updated) VALUES (:user, :image, NULL)",
+            "INSERT INTO shows(name, image, last_updated) VALUES (?, ?, NULL)",
             (name, path_to_image),
         )
         self.con.commit()
@@ -91,7 +91,7 @@ class Database:
 
     def get_show_by_name(self, name: str):
         result = self.con.execute(
-            "SELECT * FROM shows WHERE name = :name", (name,)
+            "SELECT * FROM shows WHERE name = ?", (name,)
         ).fetchone()
         if result:
             return Show(result)
@@ -99,7 +99,7 @@ class Database:
             return None
 
     def get_episodes(self, show: int) -> List[Episode]:
-        cursor = self.con.execute("SELECT * FROM episodes WHERE show = :show ", (show,))
+        cursor = self.con.execute("SELECT * FROM episodes WHERE show = ?", (show,))
         return [Episode(e) for e in cursor.fetchall()]
 
     def add_transcription(
@@ -111,27 +111,27 @@ class Database:
     ):
         # Add segments to database
         cursor = self.con.execute(
-            "INSERT INTO episodes(show, name) VALUES (:show, :name)", (show, name)
+            "INSERT INTO episodes(show, name) VALUES (?, ?)", (show, name)
         )
         rows = (
             (cursor.lastrowid, x, y)
             for x, y in zip(transcription, timestamps, strict=True)
         )
         self.con.executemany(
-            "INSERT INTO segments(episode, text, timestamp) VALUES (:ep, :text, :stamp)",
+            "INSERT INTO segments(episode, text, timestamp) VALUES (?, ?, ?)",
             rows,
         )
 
         # Update timestamp
         self.con.execute(
-            "UPDATE shows SET last_updated = :timestamp WHERE id = :show",
+            "UPDATE shows SET last_updated = ? WHERE id = ?",
             (time.time(), show),
         )
         self.con.commit()
 
     def get_transcript(self, episode_id: int) -> List[Segment]:
         cursor = self.con.execute(
-            "SELECT * FROM segments WHERE episode = :epsiode_id", (episode_id,)
+            "SELECT * FROM segments WHERE episode = ?", (episode_id,)
         )
         return [Segment(s) for s in cursor.fetchall()]
 
@@ -144,7 +144,7 @@ class Database:
         text = f'"{text}"'
         cursor = self.con.execute(
             """SELECT rowid, text, timestamp, episodes.name AS episode_name, shows.name AS show_name FROM segments
-            JOIN (SELECT rowid FROM text_index(:text) ORDER BY rank LIMIT 25) ON segments.id = rowid
+            JOIN (SELECT rowid FROM text_index(?) ORDER BY rank LIMIT 25) ON segments.id = rowid
             JOIN episodes ON segments.episode = episodes.id
             JOIN shows ON episodes.show = shows.id;""",
             (text,),
